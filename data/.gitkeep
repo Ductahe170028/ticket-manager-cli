@@ -1,2 +1,0 @@
-# Thư mục dữ liệu chạy app. File tickets.json được tạo khi có ticket đầu tiên.
-# Không commit tickets.json (xem .gitignore).
