@@ -188,13 +188,24 @@ Có test đơn vị (logic) và test tích hợp (file JSON tạm + chạy lện
 ```text
 ticket-manager-cli/
 ├── src/
-│   ├── commands/     # Nhận lệnh từ người dùng
-│   ├── services/     # Xử lý nghiệp vụ ticket
-│   ├── models/       # Hình dạng dữ liệu
-│   ├── storage/      # Đọc/ghi file JSON
-│   └── index.ts      # Điểm vào chương trình
-├── tests/            # Unit + integration
-├── data/tickets.json # Dữ liệu khi bạn chạy tay
+│   ├── commands/         # Nhận lệnh từ người dùng
+│   │   ├── parse-tags.ts #   dùng chung (tickets + kb)
+│   │   ├── tickets/      #   lệnh tickets create/list/show/update
+│   │   └── kb/           #   lệnh kb search/list/retrieve/add (Tuần 3)
+│   ├── services/         # Xử lý nghiệp vụ
+│   │   ├── tickets/
+│   │   └── kb/           #   (Tuần 3)
+│   ├── models/           # Hình dạng dữ liệu
+│   │   ├── tickets/
+│   │   └── kb/           #   (Tuần 3)
+│   ├── storage/          # Đọc/ghi file JSON (ticket)
+│   ├── clients/          # Gọi Knowledge Base — mock/HTTP (Tuần 3)
+│   └── index.ts          # Điểm vào chương trình
+├── tests/
+│   ├── helpers/          # dùng chung (chạy CLI thật)
+│   ├── tickets/          # unit/ + integration/
+│   └── kb/               # unit/ + integration/ (Tuần 3)
+├── data/tickets.json     # Dữ liệu khi bạn chạy tay
 └── README.md
 ```
 

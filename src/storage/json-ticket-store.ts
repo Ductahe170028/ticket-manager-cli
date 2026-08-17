@@ -1,7 +1,7 @@
 import * as fs from "fs/promises";
 import * as path from "path";
-import type { Ticket } from "../models/ticket";
-import type { TicketStore } from "../models/ticket-store";
+import type { Ticket } from "../models/tickets/ticket";
+import type { TicketStore } from "../models/tickets/ticket-store";
 
 /**
  * Tạo kho lưu ticket bằng một file JSON (mảng).

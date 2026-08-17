@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 import path from "path";
 import { Command } from "commander";
-import { registerCreateCommand } from "./commands/create";
-import { registerListCommand } from "./commands/list";
-import { registerShowCommand } from "./commands/show";
-import { registerUpdateCommand } from "./commands/update";
-import { createTicketService } from "./services/ticket-service";
+import { registerCreateCommand } from "./commands/tickets/create";
+import { registerListCommand } from "./commands/tickets/list";
+import { registerShowCommand } from "./commands/tickets/show";
+import { registerUpdateCommand } from "./commands/tickets/update";
+import { createTicketService } from "./services/tickets/ticket-service";
 import { createJsonTicketStore } from "./storage/json-ticket-store";
 
 /**
