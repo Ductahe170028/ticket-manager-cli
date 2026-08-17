@@ -1,3 +1,18 @@
-// Chỗ sẵn cho tuần 3 — chưa implement.
-// Sẽ viết theo TDD: xem docs/plans/week-3/tasks.vi.md (nhóm B).
-export {};
+import type { Command } from "commander";
+import type { KBService } from "../../services/kb/kb-service";
+
+/**
+ * Đăng ký lệnh `kb search <query>` (con của lệnh nhóm `kb`) vào Commander.
+ * Chỉ parse tham số và gọi service — không chứa rule nghiệp vụ.
+ */
+export function registerKbSearchCommand(kbCommand: Command, service: KBService): void {
+  kbCommand
+    .command("search <query>")
+    .option("--top-k <n>", "Số kết quả tối đa", "5")
+    .action(async (query: string, options: { topK: string }) => {
+      const results = await service.search(query, Number(options.topK));
+      for (const result of results) {
+        console.log(`${result.document.id} ${result.document.title}`);
+      }
+    });
+}

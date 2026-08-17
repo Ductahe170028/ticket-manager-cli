@@ -7,9 +7,12 @@ import { registerShowCommand } from "./commands/tickets/show";
 import { registerUpdateCommand } from "./commands/tickets/update";
 import { createTicketService } from "./services/tickets/ticket-service";
 import { createJsonTicketStore } from "./storage/json-ticket-store";
+import { registerKbSearchCommand } from "./commands/kb/kb-search";
+import { createKbService } from "./services/kb/kb-service";
+import { createMockKbClient } from "./clients/mock-kb-client";
 
 /**
- * Điểm vào CLI: gắn JSON store + service + đăng ký các lệnh tickets.
+ * Điểm vào CLI: gắn JSON store + service + đăng ký các lệnh tickets, kb.
  */
 async function main(): Promise<void> {
   const dataPath =
@@ -18,6 +21,10 @@ async function main(): Promise<void> {
   const store = createJsonTicketStore(dataPath);
   const service = createTicketService(store);
 
+  // KB_CLIENT (mock | http) — env switch sẽ làm ở case G. Hiện luôn dùng MockKBClient.
+  const kbClient = createMockKbClient();
+  const kbService = createKbService(kbClient);
+
   const program = new Command();
   program.name("tickets").description("Ticket Manager CLI").version("1.0.0");
 
@@ -25,6 +32,9 @@ async function main(): Promise<void> {
   registerListCommand(program, service);
   registerShowCommand(program, service);
   registerUpdateCommand(program, service);
+
+  const kbCommand = program.command("kb").description("Thao tác với Knowledge Base");
+  registerKbSearchCommand(kbCommand, kbService);
 
   await program.parseAsync(process.argv);
 }
