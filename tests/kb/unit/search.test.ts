@@ -31,4 +31,19 @@ describe("createKbService.search", () => {
 
     expect(results).toEqual([]);
   });
+
+  it("B3: KBClient trả nhiều hơn topK -> kb-service tự giới hạn đúng topK", async () => {
+    const threeResults: SearchResult[] = [
+      { document: { id: "doc-001", title: "A", nodePath: "/x" } },
+      { document: { id: "doc-002", title: "B", nodePath: "/x" } },
+      { document: { id: "doc-003", title: "C", nodePath: "/x" } },
+    ];
+    const client = createFakeKBClient(threeResults);
+    const service = createKbService(client);
+
+    const results = await service.search("x", 2);
+
+    expect(results).toHaveLength(2);
+    expect(results).toEqual(threeResults.slice(0, 2));
+  });
 });
