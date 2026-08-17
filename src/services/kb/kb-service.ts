@@ -12,9 +12,13 @@ export interface KBService {
  */
 export function createKbService(client: KBClient): KBService {
   return {
-    /** Tìm document theo từ khóa; chuyển thẳng cho KBClient xử lý so khớp. */
+    /**
+     * Tìm document theo từ khóa; KBClient xử lý so khớp, service tự giới hạn
+     * lại đúng topK trước khi trả về — không tin tưởng tuyệt đối vào client.
+     */
     async search(query: string, topK?: number): Promise<SearchResult[]> {
-      return client.search(query, topK);
+      const results = await client.search(query, topK);
+      return topK !== undefined ? results.slice(0, topK) : results;
     },
   };
 }
