@@ -22,4 +22,13 @@ describe("createKbService.search", () => {
     expect(results).toEqual(expected);
     expect(client.lastSearchCall).toEqual({ query: "refund", topK: undefined });
   });
+
+  it("B2: KBClient không tìm thấy gì -> kb-service trả mảng rỗng, không lỗi", async () => {
+    const client = createFakeKBClient([]);
+    const service = createKbService(client);
+
+    const results = await service.search("khong-ton-tai-xyz");
+
+    expect(results).toEqual([]);
+  });
 });
