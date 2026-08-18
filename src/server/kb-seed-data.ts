@@ -1,89 +1,93 @@
 import type { Document } from "../models/kb/document";
 
 /**
- * Dữ liệu khởi tạo cho server KB thật — cùng nội dung với SEED_DOCUMENTS
- * bên clients/mock-kb-client.ts (xem docs/plans/week-3/decisions.vi.md mục 4),
- * nhưng để riêng file vì server/ là tầng độc lập với clients/ (server không
- * import ngược từ clients — một server thật không nên phụ thuộc code phía client).
+ * Dữ liệu khởi tạo cho server KB thật — CỐ TÌNH khác hoàn toàn nội dung với SEED_DOCUMENTS
+ * bên clients/mock-kb-client.ts, để lúc test tay (search/list/retrieve) nhìn kết quả là biết
+ * ngay đang nói chuyện với Mock hay với server thật, không lẫn 2 nguồn.
+ *
+ * Vẫn giữ cấu trúc tương tự để dễ so sánh: đúng 10 document, có 1 cặp cùng nodePath
+ * (/server-docs/monitoring), có 1 từ khóa chỉ khớp title 1 document (để test match đơn),
+ * và 1 từ khóa khớp content của 2 document (để test topK).
  */
 export const SEED_DOCUMENTS: readonly Document[] = Object.freeze([
   {
     id: "doc-001",
-    title: "Customer Response Template",
-    nodePath: "/templates/email",
-    tags: ["template", "email"],
+    title: "Server Status Page Guide",
+    nodePath: "/server-docs/monitoring",
+    tags: ["server", "monitoring"],
     content:
-      "Xin chào quý khách, cảm ơn bạn đã liên hệ với đội ngũ hỗ trợ của chúng tôi. Chúng tôi sẽ phản hồi trong vòng 24 giờ.",
+      "Chào mừng bạn đến với hệ thống server thật (không phải Mock). Đội ngũ vận hành server theo dõi trạng thái 24/7 qua trang status.",
   },
   {
     id: "doc-002",
-    title: "Refund Request Reply",
-    nodePath: "/templates/email",
-    tags: ["template", "email", "refund"],
+    title: "Server Restart Procedure",
+    nodePath: "/server-docs/monitoring",
+    tags: ["server", "monitoring", "restart"],
     content:
-      "Chúng tôi đã nhận được yêu cầu hoàn tiền (refund) của bạn. Vui lòng cung cấp mã đơn hàng để chúng tôi xử lý.",
+      "Quy trình khởi động lại (restart) server: thông báo trước 15 phút, đội ngũ vận hành server xác nhận trạng thái ổn định sau khi restart.",
   },
   {
     id: "doc-003",
-    title: "DevOps On-call Schedule",
-    nodePath: "/team/devops",
-    tags: ["team", "devops"],
+    title: "Load Balancer Configuration",
+    nodePath: "/server-docs/network",
+    tags: ["server", "network"],
     content:
-      "Lịch trực DevOps hàng tuần: Thứ 2 - Anh A, Thứ 3 - Chị B, cuối tuần luân phiên trực.",
+      "Cấu hình load balancer cho server: định tuyến traffic đều giữa các node, tự động chuyển sang node khác khi 1 node lỗi.",
   },
   {
     id: "doc-004",
-    title: "Password Reset Instructions",
-    nodePath: "/templates/security",
-    tags: ["template", "security"],
+    title: "Database Backup Policy",
+    nodePath: "/server-docs/database",
+    tags: ["server", "database"],
     content:
-      "Hướng dẫn đặt lại mật khẩu: nhấn vào đường dẫn được gửi qua email, nhập mật khẩu mới có ít nhất 8 ký tự.",
+      "Chính sách backup database của server: sao lưu mỗi 6 giờ, lưu trữ 30 ngày, kiểm tra khôi phục hàng tuần.",
   },
   {
     id: "doc-005",
-    title: "Onboarding Checklist for New Engineers",
-    nodePath: "/onboarding/engineering",
-    tags: ["onboarding", "engineering"],
+    title: "SSL Certificate Renewal",
+    nodePath: "/server-docs/security",
+    tags: ["server", "security"],
     content:
-      "Ngày đầu tiên: cài đặt môi trường, truy cập repo, đọc tài liệu kiến trúc hệ thống, gặp mentor được phân công.",
+      "Gia hạn chứng chỉ SSL cho server: kiểm tra hạn trước 30 ngày, gia hạn tự động qua Let's Encrypt.",
   },
   {
     id: "doc-006",
-    title: "Incident Response Runbook",
-    nodePath: "/runbooks/incident",
-    tags: ["runbook", "incident"],
+    title: "API Gateway Setup",
+    nodePath: "/server-docs/network",
+    tags: ["server", "network", "api"],
     content:
-      "Khi xảy ra sự cố: xác nhận mức độ nghiêm trọng, thông báo nhóm liên quan, ghi log thời gian xử lý, viết báo cáo sau sự cố.",
+      "Thiết lập API Gateway trên server: định nghĩa route, giới hạn tốc độ request, xác thực bằng token.",
   },
   {
     id: "doc-007",
-    title: "Vacation Request Policy",
-    nodePath: "/hr/policies",
-    tags: ["hr", "policy"],
+    title: "Container Deployment Guide",
+    nodePath: "/server-docs/deployment",
+    tags: ["server", "deployment"],
     content:
-      "Nhân viên cần gửi yêu cầu nghỉ phép trước ít nhất 3 ngày làm việc, quản lý trực tiếp phê duyệt trên hệ thống.",
+      "Hướng dẫn triển khai container lên server: build image, đẩy lên registry, deploy qua pipeline CI/CD.",
   },
   {
     id: "doc-008",
-    title: "API Rate Limit Guide",
-    nodePath: "/docs/api",
-    tags: ["api", "guide"],
-    content: "Giới hạn 100 request mỗi phút cho mỗi API key, vượt ngưỡng sẽ nhận mã lỗi 429.",
+    title: "Logging Aggregation Setup",
+    nodePath: "/server-docs/logging",
+    tags: ["server", "logging"],
+    content:
+      "Thiết lập tập trung log của server: gom log từ nhiều node về 1 nơi, cảnh báo khi tỉ lệ lỗi vượt ngưỡng.",
   },
   {
     id: "doc-009",
-    title: "Code Review Checklist",
-    nodePath: "/engineering/process",
-    tags: ["engineering", "process"],
+    title: "Firewall Rules Reference",
+    nodePath: "/server-docs/security",
+    tags: ["server", "security", "firewall"],
     content:
-      "Kiểm tra tên biến rõ nghĩa, có test đi kèm, không để lại code comment thừa, đúng chuẩn style project.",
+      "Danh sách quy tắc firewall của server: chỉ mở các port cần thiết, tự động chặn IP có dấu hiệu tấn công.",
   },
   {
     id: "doc-010",
-    title: "Customer Escalation Template",
-    nodePath: "/templates/support",
-    tags: ["template", "support", "escalation"],
+    title: "Disaster Recovery Plan",
+    nodePath: "/server-docs/ops",
+    tags: ["server", "ops", "recovery"],
     content:
-      "Kính gửi khách hàng, đội ngũ hỗ trợ đang ưu tiên xử lý yêu cầu escalation của bạn ngay lập tức.",
+      "Kế hoạch khôi phục sau thảm hoạ của hệ thống server: server dự phòng ở khu vực khác, tự động chuyển traffic khi cần.",
   },
 ]);

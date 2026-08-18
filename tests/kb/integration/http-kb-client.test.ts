@@ -25,7 +25,7 @@ describe("HTTPKBClient — F1: search()", () => {
   it("F1: gửi đúng POST /search, tìm khớp title/content và parse response đúng", async () => {
     const client = createHttpKbClient(server.url);
 
-    const results = await client.search("refund");
+    const results = await client.search("restart");
 
     expect(results).toHaveLength(1);
     expect(results[0].document.id).toBe("doc-002");
@@ -34,7 +34,7 @@ describe("HTTPKBClient — F1: search()", () => {
   it("F1: topK giới hạn đúng số lượng kết quả trả về", async () => {
     const client = createHttpKbClient(server.url);
 
-    const results = await client.search("chúng tôi", 1);
+    const results = await client.search("vận hành", 1);
 
     expect(results).toHaveLength(1);
   });
@@ -61,11 +61,11 @@ describe("HTTPKBClient — F2: list()", () => {
 
   it("F2: gửi đúng POST /list với nodePath -> chỉ trả document đúng node đó", async () => {
     const client = createHttpKbClient(server.url);
-    const expectedIds = SEED_DOCUMENTS.filter((d) => d.nodePath === "/templates/email").map(
-      (d) => d.id
-    );
+    const expectedIds = SEED_DOCUMENTS.filter(
+      (d) => d.nodePath === "/server-docs/monitoring"
+    ).map((d) => d.id);
 
-    const results: Document[] = await client.list("/templates/email");
+    const results: Document[] = await client.list("/server-docs/monitoring");
 
     expect(results.map((d) => d.id).sort()).toEqual(expectedIds.sort());
   });
