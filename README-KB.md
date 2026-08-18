@@ -2,8 +2,36 @@
 
 > Đây là phần mở rộng của [Ticket Manager CLI](./README-Tickets.md) (Tuần 2). Tài liệu này chỉ nói
 > về phần KB — cách CLI kết nối tới một Knowledge Base (kho tài liệu, viết tắt là "KB") bên ngoài
-> để tìm kiếm, xem, thêm tài liệu. Phần cài đặt/cấu hình chung (Node.js, `npm install`, cấu trúc
-> project…) xem ở [README-Tickets.md](./README-Tickets.md) — tài liệu Tuần 2.
+> để tìm kiếm, xem, thêm tài liệu. Lệnh ticket tuần 2 xem ở [README-Tickets.md](./README-Tickets.md).
+
+---
+
+## Chạy thử ngay (nếu bỏ qua tuần 2)
+
+Tuần 2 và tuần 3 **cùng một lệnh** `tickets`. Clone về máy rồi làm lần lượt:
+
+```powershell
+cd ticket-manager-cli
+npm install
+npm run build
+npm link
+```
+
+Sau đó gõ được ngay (không cần bật server — mặc định dùng dữ liệu mẫu mock):
+
+```powershell
+tickets kb list
+tickets kb search restart
+tickets kb retrieve doc-001
+```
+
+Muốn thử server thật: copy `.env.example` thành `.env`, đổi `KB_CLIENT=http`, rồi xem mục 5 bên dưới.
+
+Nếu chưa `npm link`, vẫn chạy được bằng:
+
+```powershell
+npm.cmd run tickets -- kb list
+```
 
 ---
 
@@ -108,10 +136,12 @@ Nếu bạn đặt `KB_CLIENT=http` nhưng quên điền `KB_API_URL`, CLI sẽ 
 `.env` (mặc định đã là `KB_CLIENT=mock`):
 
 ```powershell
-npm.cmd run tickets -- kb list
-npm.cmd run tickets -- kb search restart
-npm.cmd run tickets -- kb retrieve doc-001
+tickets kb list
+tickets kb search restart
+tickets kb retrieve doc-001
 ```
+
+Chưa `npm link` thì thay `tickets` bằng `npm.cmd run tickets --`.
 
 10 tài liệu mẫu nằm sẵn trong code, ở file `src/clients/mock-kb-client.ts`. Dữ liệu này chỉ tồn tại
 trong lúc lệnh đang chạy — mỗi lần gõ lệnh là một lần chương trình khởi động lại từ đầu, nên không
@@ -147,11 +177,13 @@ KB_API_URL=http://localhost:4000
 bình thường:**
 
 ```powershell
-npm.cmd run tickets -- kb list
-npm.cmd run tickets -- kb search monitoring
-npm.cmd run tickets -- kb retrieve doc-001
-npm.cmd run tickets -- kb add --file note.md --path "/new/node" --title "Ghi chú test"
+tickets kb list
+tickets kb search monitoring
+tickets kb retrieve doc-001
+tickets kb add --file note.md --path "/new/node" --title "Ghi chú test"
 ```
+
+Chưa `npm link` thì thay `tickets` bằng `npm.cmd run tickets --`.
 
 Tài liệu vừa `add` sẽ tồn tại **trong suốt thời gian server còn chạy** — vì dữ liệu được giữ trong
 bộ nhớ của chương trình server, hễ tắt server (đóng cửa sổ terminal ở bước 1, hoặc bấm Ctrl+C) là
@@ -164,11 +196,13 @@ Muốn quay lại chạy nhanh bằng mock: mở `.env`, đổi `KB_CLIENT` về
 
 ## 6. Các lệnh
 
+Các ví dụ dưới đây dùng `tickets` (sau `npm link`). Chưa link thì thay bằng `npm.cmd run tickets --`.
+
 ### `kb search <query>` — tìm tài liệu theo từ khóa
 
 ```powershell
-npm.cmd run tickets -- kb search refund
-npm.cmd run tickets -- kb search refund --top-k 3
+tickets kb search refund
+tickets kb search refund --top-k 3
 ```
 
 - Tìm khớp từ khóa trong **title (tiêu đề) trước, content (nội dung) sau** — nếu 1 tài liệu vừa
@@ -184,9 +218,9 @@ npm.cmd run tickets -- kb search refund --top-k 3
 ### `kb list` — liệt kê tài liệu
 
 ```powershell
-npm.cmd run tickets -- kb list
-npm.cmd run tickets -- kb list --node "/templates/email"
-npm.cmd run tickets -- kb list --limit 2
+tickets kb list
+tickets kb list --node "/templates/email"
+tickets kb list --limit 2
 ```
 
 - Không truyền `--node` → hiện toàn bộ tài liệu đang có.
@@ -197,7 +231,7 @@ npm.cmd run tickets -- kb list --limit 2
 ### `kb retrieve <docId>` — xem đầy đủ nội dung 1 tài liệu
 
 ```powershell
-npm.cmd run tickets -- kb retrieve doc-001
+tickets kb retrieve doc-001
 ```
 
 - In ra đầy đủ mọi thông tin của tài liệu: `id`, `title`, `nodePath`, `tags`, `content`.
@@ -207,7 +241,7 @@ npm.cmd run tickets -- kb retrieve doc-001
 ### `kb add` — thêm tài liệu mới
 
 ```powershell
-npm.cmd run tickets -- kb add --file note.md --path "/new/node" --title "Ghi chú" --tags note,demo
+tickets kb add --file note.md --path "/new/node" --title "Ghi chú" --tags note,demo
 ```
 
 - `--file <đường-dẫn-file>` (bắt buộc): đường dẫn tới 1 file văn bản chứa nội dung tài liệu muốn

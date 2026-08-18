@@ -33,7 +33,14 @@ npm run build
 npm link
 ```
 
-Sau bước này bạn có thể gõ `tickets list`, `tickets create ...` mà không cần `npm.cmd run ...`.
+Sau bước này, lệnh `tickets` dùng được **cả tuần 2 lẫn tuần 3** (cùng một CLI), không cần cài thêm:
+
+```powershell
+tickets list
+tickets kb list
+```
+
+`tickets kb ...` mặc định dùng dữ liệu mẫu (mock), không cần bật server. Chi tiết KB xem [README-KB.md](./README-KB.md).
 
 Nếu bỏ qua bước 3 cũng được — dùng cách chạy trong mục Usage bên dưới.
 
