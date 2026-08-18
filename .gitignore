@@ -4,3 +4,4 @@ coverage/
 data/tickets.json
 *.log
 .DS_Store
+.env

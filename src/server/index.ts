@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { createKbServer } from "./create-kb-server";
 
 /**

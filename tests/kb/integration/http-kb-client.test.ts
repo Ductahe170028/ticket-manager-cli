@@ -157,6 +157,22 @@ describe("HTTPKBClient — F4: add()", () => {
 
     expect(found).toEqual(created);
   });
+
+  it("server tự validate title rỗng (gọi thẳng server, không qua kb-service) -> báo lỗi, không tạo document", async () => {
+    const client = createHttpKbClient(server.url);
+
+    await expect(
+      client.add({ title: "   ", content: "nội dung", nodePath: "/new/node", tags: [] })
+    ).rejects.toThrow(/title/i);
+  });
+
+  it("server tự validate nodePath rỗng (gọi thẳng server, không qua kb-service) -> báo lỗi, không tạo document", async () => {
+    const client = createHttpKbClient(server.url);
+
+    await expect(
+      client.add({ title: "Note", content: "nội dung", nodePath: "   ", tags: [] })
+    ).rejects.toThrow(/nodePath/i);
+  });
 });
 
 describe("HTTPKBClient — F5: server trả lỗi (4xx/5xx)", () => {

@@ -30,10 +30,26 @@ function readJsonBody(req: http.IncomingMessage): Promise<Record<string, unknown
   });
 }
 
+/**
+ * Server tự validate title/nodePath không rỗng — không tin tưởng tuyệt đối request gửi
+ * tới, vì server có thể bị gọi thẳng (bỏ qua CLI/kb-service, ví dụ ai đó gọi trực tiếp
+ * bằng Postman/curl). Logic giống requireTitle/requireNodePath ở services/kb/kb-validation.ts
+ * nhưng viết riêng — server/ không phụ thuộc code phía CLI.
+ */
+function requireNonBlank(value: unknown, field: string): string {
+  const trimmed = typeof value === "string" ? value.trim() : "";
+  if (!trimmed) {
+    throw new Error(`${field} is required`);
+  }
+  return trimmed;
+}
+
 function sendJson(res: http.ServerResponse, status: number, body: unknown): void {
   const payload = JSON.stringify(body);
-  res.writeHead(status, { "Content-Type": "application/json" });
-  res.end(payload);
+  // Khai báo rõ charset=utf-8 — thiếu phần này 1 số HTTP client (PowerShell Invoke-RestMethod)
+  // sẽ đoán sai bảng mã lúc giải mã, làm tiếng Việt hiển thị sai (mojibake) dù dữ liệu gửi đi đúng.
+  res.writeHead(status, { "Content-Type": "application/json; charset=utf-8" });
+  res.end(payload, "utf8");
 }
 
 /**
@@ -97,12 +113,22 @@ export function createKbServer(): http.Server {
           }
 
           case "/add": {
+            let title: string;
+            let nodePath: string;
+            try {
+              title = requireNonBlank(body.title, "title");
+              nodePath = requireNonBlank(body.nodePath, "nodePath");
+            } catch (err) {
+              sendJson(res, 400, { error: err instanceof Error ? err.message : String(err) });
+              return;
+            }
+
             const id = `doc-${String(documents.length + 1).padStart(3, "0")}`;
             const created: Document = {
               id,
-              title: body.title as string,
+              title,
               content: body.content as string,
-              nodePath: body.nodePath as string,
+              nodePath,
               tags: (body.tags as string[] | undefined) ?? [],
             };
             documents.push(created);

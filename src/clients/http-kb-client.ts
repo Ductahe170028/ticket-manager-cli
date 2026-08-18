@@ -14,7 +14,9 @@ async function postToKbServer(http: AxiosInstance, path: string, body: unknown):
   } catch (err) {
     if (axios.isAxiosError(err)) {
       if (err.response) {
-        throw new Error(`KB server trả lỗi status ${err.response.status} khi gọi ${path}`);
+        const data = err.response.data as { error?: string } | undefined;
+        const detail = data?.error ? `: ${data.error}` : "";
+        throw new Error(`KB server trả lỗi status ${err.response.status} khi gọi ${path}${detail}`);
       }
       throw new Error(`Không kết nối được KB server khi gọi ${path}: ${err.message}`);
     }

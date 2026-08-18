@@ -12,10 +12,3 @@ export interface SearchResult {
   document: Pick<Document, "id" | "title" | "nodePath">;
   matchType?: string;
 }
-
-/** Tham số truy vấn khi gọi search. */
-export interface KBQuery {
-  query: string;
-  topK?: number;
-  filters?: Record<string, string>;
-}

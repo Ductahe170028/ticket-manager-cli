@@ -43,6 +43,16 @@ npm test
 
 ## Configuration (Cấu hình)
 
+### File `.env` (tuỳ chọn)
+
+Copy `.env.example` thành `.env` rồi chỉnh giá trị nếu muốn đổi cấu hình mà không cần set biến môi trường mỗi lần gõ lệnh:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+`.env` không commit lên git (đã có trong `.gitignore`) — mỗi máy tự giữ bản riêng.
+
 ### File lưu ticket
 
 - Mặc định mọi ticket nằm ở `data/tickets.json`.

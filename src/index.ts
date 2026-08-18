@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import "dotenv/config";
 import path from "path";
 import { Command } from "commander";
 import { registerCreateCommand } from "./commands/tickets/create";
