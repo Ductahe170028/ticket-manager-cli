@@ -26,13 +26,13 @@ describe("CLI kb list", () => {
     });
   });
 
-  it("kb list không truyền --node -> liệt kê toàn bộ 3 document mẫu", async () => {
+  it("kb list không truyền --node -> liệt kê toàn bộ 10 document mẫu", async () => {
     await withTempTicketsFile(async (filePath) => {
       const result = await runTickets(["kb", "list"], filePath);
 
       expect(result.code).toBe(0);
       const lines = result.stdout.trim().split("\n").filter(Boolean);
-      expect(lines).toHaveLength(3);
+      expect(lines).toHaveLength(10);
     });
   });
 

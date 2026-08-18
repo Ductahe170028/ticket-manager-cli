@@ -1,9 +1,10 @@
 import type { KBClient } from "../../models/kb/kb-client";
-import type { SearchResult } from "../../models/kb/document";
+import type { Document, SearchResult } from "../../models/kb/document";
 
 /** Các thao tác nghiệp vụ KB mà commands được phép gọi. */
 export interface KBService {
   search(query: string, topK?: number): Promise<SearchResult[]>;
+  list(nodePath?: string, limit?: number): Promise<Document[]>;
 }
 
 /**
@@ -19,6 +20,15 @@ export function createKbService(client: KBClient): KBService {
     async search(query: string, topK?: number): Promise<SearchResult[]> {
       const results = await client.search(query, topK);
       return topK !== undefined ? results.slice(0, topK) : results;
+    },
+
+    /**
+     * Liệt kê document theo node; KBClient xử lý lọc, service tự giới hạn
+     * lại đúng limit trước khi trả về — không tin tưởng tuyệt đối vào client.
+     */
+    async list(nodePath?: string, limit?: number): Promise<Document[]> {
+      const results = await client.list(nodePath, limit);
+      return limit !== undefined ? results.slice(0, limit) : results;
     },
   };
 }

@@ -1,7 +1,11 @@
 import type { AddDocumentInput, KBClient } from "../models/kb/kb-client";
 import type { Document, SearchResult } from "../models/kb/document";
 
-/** 3 document mẫu cố định — xem docs/plans/week-3/decisions.vi.md mục 4. */
+/**
+ * 10 document mẫu cố định — xem docs/plans/week-3/decisions.vi.md mục 4.
+ * doc-004..doc-010 cố tình khác nodePath và không trùng từ khóa với doc-001..doc-003
+ * (để không phá test cũ đang xanh của case B/C).
+ */
 const SEED_DOCUMENTS: Document[] = [
   {
     id: "doc-001",
@@ -27,6 +31,61 @@ const SEED_DOCUMENTS: Document[] = [
     content:
       "Lịch trực DevOps hàng tuần: Thứ 2 - Anh A, Thứ 3 - Chị B, cuối tuần luân phiên trực.",
   },
+  {
+    id: "doc-004",
+    title: "Password Reset Instructions",
+    nodePath: "/templates/security",
+    tags: ["template", "security"],
+    content:
+      "Hướng dẫn đặt lại mật khẩu: nhấn vào đường dẫn được gửi qua email, nhập mật khẩu mới có ít nhất 8 ký tự.",
+  },
+  {
+    id: "doc-005",
+    title: "Onboarding Checklist for New Engineers",
+    nodePath: "/onboarding/engineering",
+    tags: ["onboarding", "engineering"],
+    content:
+      "Ngày đầu tiên: cài đặt môi trường, truy cập repo, đọc tài liệu kiến trúc hệ thống, gặp mentor được phân công.",
+  },
+  {
+    id: "doc-006",
+    title: "Incident Response Runbook",
+    nodePath: "/runbooks/incident",
+    tags: ["runbook", "incident"],
+    content:
+      "Khi xảy ra sự cố: xác nhận mức độ nghiêm trọng, thông báo nhóm liên quan, ghi log thời gian xử lý, viết báo cáo sau sự cố.",
+  },
+  {
+    id: "doc-007",
+    title: "Vacation Request Policy",
+    nodePath: "/hr/policies",
+    tags: ["hr", "policy"],
+    content:
+      "Nhân viên cần gửi yêu cầu nghỉ phép trước ít nhất 3 ngày làm việc, quản lý trực tiếp phê duyệt trên hệ thống.",
+  },
+  {
+    id: "doc-008",
+    title: "API Rate Limit Guide",
+    nodePath: "/docs/api",
+    tags: ["api", "guide"],
+    content: "Giới hạn 100 request mỗi phút cho mỗi API key, vượt ngưỡng sẽ nhận mã lỗi 429.",
+  },
+  {
+    id: "doc-009",
+    title: "Code Review Checklist",
+    nodePath: "/engineering/process",
+    tags: ["engineering", "process"],
+    content:
+      "Kiểm tra tên biến rõ nghĩa, có test đi kèm, không để lại code comment thừa, đúng chuẩn style project.",
+  },
+  {
+    id: "doc-010",
+    title: "Customer Escalation Template",
+    nodePath: "/templates/support",
+    tags: ["template", "support", "escalation"],
+    content:
+      "Kính gửi khách hàng, đội ngũ hỗ trợ đang ưu tiên xử lý yêu cầu escalation của bạn ngay lập tức.",
+  },
 ];
 
 /** Tìm nơi khớp keyword — ưu tiên title trước, sau đó mới xét content. */
@@ -37,9 +96,9 @@ function findMatchType(doc: Document, keyword: string): "title" | "content" | nu
 }
 
 /**
- * Tạo KBClient giả lập với 3 document mẫu cố định trong bộ nhớ (mất khi restart chương trình).
+ * Tạo KBClient giả lập với 10 document mẫu cố định trong bộ nhớ (mất khi restart chương trình).
  * Style: factory function — không dùng class, giống createJsonTicketStore.
- * list/retrieve/add chưa implement — sẽ làm ở case C/D/E.
+ * add() chưa implement — sẽ làm ở case E.
  */
 export function createMockKbClient(): KBClient {
   const documents: Document[] = [...SEED_DOCUMENTS];
@@ -63,8 +122,13 @@ export function createMockKbClient(): KBClient {
       return topK !== undefined ? results.slice(0, topK) : results;
     },
 
-    async list(): Promise<Document[]> {
-      throw new Error("MockKBClient: list() chưa implement — xem case C");
+    async list(nodePath?: string, limit?: number): Promise<Document[]> {
+      const filtered =
+        nodePath !== undefined
+          ? documents.filter((doc) => doc.nodePath === nodePath)
+          : [...documents];
+
+      return limit !== undefined ? filtered.slice(0, limit) : filtered;
     },
 
     async retrieve(): Promise<Document | null> {

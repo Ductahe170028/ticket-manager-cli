@@ -62,12 +62,12 @@ describe("createMockKbClient.list", () => {
     expect(results).toEqual([]);
   });
 
-  it("C: không truyền nodePath -> liệt kê toàn bộ 3 document mẫu", async () => {
+  it("C: không truyền nodePath -> liệt kê toàn bộ 10 document mẫu", async () => {
     const client = createMockKbClient();
 
     const results = await client.list();
 
-    expect(results).toHaveLength(3);
+    expect(results).toHaveLength(10);
   });
 
   it("C: limit giới hạn đúng số lượng kết quả trả về", async () => {
