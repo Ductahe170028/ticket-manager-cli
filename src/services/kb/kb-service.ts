@@ -6,6 +6,7 @@ import { applyLimit } from "../../utils/apply-limit";
 export interface KBService {
   search(query: string, topK?: number): Promise<SearchResult[]>;
   list(nodePath?: string, limit?: number): Promise<Document[]>;
+  retrieve(docId: string): Promise<Document>;
 }
 
 /**
@@ -30,6 +31,18 @@ export function createKbService(client: KBClient): KBService {
     async list(nodePath?: string, limit?: number): Promise<Document[]> {
       const results = await client.list(nodePath, limit);
       return applyLimit(results, limit);
+    },
+
+    /**
+     * Lấy document đầy đủ theo id; KBClient trả null nếu không có →
+     * service chuyển thành lỗi rõ nghĩa "not found" cho tầng CLI xử lý.
+     */
+    async retrieve(docId: string): Promise<Document> {
+      const doc = await client.retrieve(docId);
+      if (!doc) {
+        throw new Error(`document not found: ${docId}`);
+      }
+      return doc;
     },
   };
 }

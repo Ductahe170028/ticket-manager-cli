@@ -9,6 +9,7 @@ import { createTicketService } from "./services/tickets/ticket-service";
 import { createJsonTicketStore } from "./storage/json-ticket-store";
 import { registerKbSearchCommand } from "./commands/kb/kb-search";
 import { registerKbListCommand } from "./commands/kb/kb-list";
+import { registerKbRetrieveCommand } from "./commands/kb/kb-retrieve";
 import { createKbService } from "./services/kb/kb-service";
 import { createMockKbClient } from "./clients/mock-kb-client";
 
@@ -37,6 +38,7 @@ async function main(): Promise<void> {
   const kbCommand = program.command("kb").description("Thao tác với Knowledge Base");
   registerKbSearchCommand(kbCommand, kbService);
   registerKbListCommand(kbCommand, kbService);
+  registerKbRetrieveCommand(kbCommand, kbService);
 
   await program.parseAsync(process.argv);
 }

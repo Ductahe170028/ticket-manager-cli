@@ -136,8 +136,8 @@ export function createMockKbClient(): KBClient {
       return applyLimit(filtered, limit);
     },
 
-    async retrieve(): Promise<Document | null> {
-      throw new Error("MockKBClient: retrieve() chưa implement — xem case D");
+    async retrieve(docId: string): Promise<Document | null> {
+      return documents.find((doc) => doc.id === docId) ?? null;
     },
 
     async add(_input: AddDocumentInput): Promise<Document> {
