@@ -3,7 +3,7 @@
  * Test trực tiếp MockKBClient (không qua kb-service) với 3 doc mẫu đã chốt
  * (docs/plans/week-3/decisions.vi.md mục 4).
  */
-import { createMockKbClient } from "../../../src/clients/mock-kb-client";
+import { createMockKbClient, SEED_DOCUMENTS } from "../../../src/clients/mock-kb-client";
 
 describe("createMockKbClient.search", () => {
   it("B4: từ khóa khớp title -> trả đúng document (doc-002 'refund')", async () => {
@@ -46,12 +46,15 @@ describe("createMockKbClient.search", () => {
 });
 
 describe("createMockKbClient.list", () => {
-  it("C: nodePath có document -> trả đúng danh sách trong node đó (2 doc /templates/email)", async () => {
+  it("C: nodePath có document -> trả đúng danh sách trong node đó", async () => {
     const client = createMockKbClient();
+    const expectedIds = SEED_DOCUMENTS.filter((d) => d.nodePath === "/templates/email").map(
+      (d) => d.id
+    );
 
     const results = await client.list("/templates/email");
 
-    expect(results.map((d) => d.id)).toEqual(["doc-001", "doc-002"]);
+    expect(results.map((d) => d.id)).toEqual(expectedIds);
   });
 
   it("C: nodePath không có document nào -> trả mảng rỗng, không lỗi", async () => {
@@ -62,12 +65,12 @@ describe("createMockKbClient.list", () => {
     expect(results).toEqual([]);
   });
 
-  it("C: không truyền nodePath -> liệt kê toàn bộ 10 document mẫu", async () => {
+  it("C: không truyền nodePath -> liệt kê toàn bộ document mẫu hiện có", async () => {
     const client = createMockKbClient();
 
     const results = await client.list();
 
-    expect(results).toHaveLength(10);
+    expect(results).toHaveLength(SEED_DOCUMENTS.length);
   });
 
   it("C: limit giới hạn đúng số lượng kết quả trả về", async () => {
@@ -80,10 +83,34 @@ describe("createMockKbClient.list", () => {
 
   it("C: nodePath + limit dùng cùng lúc -> lọc đúng node rồi mới giới hạn đúng limit", async () => {
     const client = createMockKbClient();
+    const firstExpectedId = SEED_DOCUMENTS.filter((d) => d.nodePath === "/templates/email")[0].id;
 
     const results = await client.list("/templates/email", 1);
 
     expect(results).toHaveLength(1);
-    expect(results[0].id).toBe("doc-001");
+    expect(results[0].id).toBe(firstExpectedId);
+  });
+});
+
+describe("createMockKbClient.retrieve", () => {
+  it("D: docId tồn tại -> trả đúng document đầy đủ (title, content, nodePath, tags)", async () => {
+    const client = createMockKbClient();
+
+    const result = await client.retrieve("doc-002");
+
+    expect(result).not.toBeNull();
+    expect(result?.id).toBe("doc-002");
+    expect(result?.title).toBe("Refund Request Reply");
+    expect(result?.nodePath).toBe("/templates/email");
+    expect(result?.tags).toEqual(["template", "email", "refund"]);
+    expect(result?.content).toContain("hoàn tiền");
+  });
+
+  it("D: docId không tồn tại -> trả null, không throw", async () => {
+    const client = createMockKbClient();
+
+    const result = await client.retrieve("doc-khong-ton-tai");
+
+    expect(result).toBeNull();
   });
 });

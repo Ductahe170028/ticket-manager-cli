@@ -3,17 +3,23 @@
  * Dùng MockKBClient mặc định (KB_CLIENT không set → mock, theo decisions.vi.md mục 5).
  */
 import { runTickets, withTempTicketsFile } from "../../helpers/run-cli";
+import { SEED_DOCUMENTS } from "../../../src/clients/mock-kb-client";
 
 describe("CLI kb list", () => {
-  it('kb list --node "/templates/email" -> in đúng 2 document trong node đó', async () => {
+  it('kb list --node "/templates/email" -> in đúng các document trong node đó', async () => {
+    const expectedIds = SEED_DOCUMENTS.filter((d) => d.nodePath === "/templates/email").map(
+      (d) => d.id
+    );
+
     await withTempTicketsFile(async (filePath) => {
       const result = await runTickets(["kb", "list", "--node", "/templates/email"], filePath);
 
       expect(result.code).toBe(0);
       const lines = result.stdout.trim().split("\n").filter(Boolean);
-      expect(lines).toHaveLength(2);
-      expect(result.stdout).toMatch(/doc-001/);
-      expect(result.stdout).toMatch(/doc-002/);
+      expect(lines).toHaveLength(expectedIds.length);
+      for (const id of expectedIds) {
+        expect(result.stdout).toMatch(new RegExp(id));
+      }
     });
   });
 
@@ -26,13 +32,13 @@ describe("CLI kb list", () => {
     });
   });
 
-  it("kb list không truyền --node -> liệt kê toàn bộ 10 document mẫu", async () => {
+  it("kb list không truyền --node -> liệt kê toàn bộ document mẫu hiện có", async () => {
     await withTempTicketsFile(async (filePath) => {
       const result = await runTickets(["kb", "list"], filePath);
 
       expect(result.code).toBe(0);
       const lines = result.stdout.trim().split("\n").filter(Boolean);
-      expect(lines).toHaveLength(10);
+      expect(lines).toHaveLength(SEED_DOCUMENTS.length);
     });
   });
 
