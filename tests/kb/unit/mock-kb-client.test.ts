@@ -44,3 +44,46 @@ describe("createMockKbClient.search", () => {
     expect(limited).toHaveLength(1);
   });
 });
+
+describe("createMockKbClient.list", () => {
+  it("C: nodePath có document -> trả đúng danh sách trong node đó (2 doc /templates/email)", async () => {
+    const client = createMockKbClient();
+
+    const results = await client.list("/templates/email");
+
+    expect(results.map((d) => d.id)).toEqual(["doc-001", "doc-002"]);
+  });
+
+  it("C: nodePath không có document nào -> trả mảng rỗng, không lỗi", async () => {
+    const client = createMockKbClient();
+
+    const results = await client.list("/khong-ton-tai");
+
+    expect(results).toEqual([]);
+  });
+
+  it("C: không truyền nodePath -> liệt kê toàn bộ 3 document mẫu", async () => {
+    const client = createMockKbClient();
+
+    const results = await client.list();
+
+    expect(results).toHaveLength(3);
+  });
+
+  it("C: limit giới hạn đúng số lượng kết quả trả về", async () => {
+    const client = createMockKbClient();
+
+    const results = await client.list(undefined, 1);
+
+    expect(results).toHaveLength(1);
+  });
+
+  it("C: nodePath + limit dùng cùng lúc -> lọc đúng node rồi mới giới hạn đúng limit", async () => {
+    const client = createMockKbClient();
+
+    const results = await client.list("/templates/email", 1);
+
+    expect(results).toHaveLength(1);
+    expect(results[0].id).toBe("doc-001");
+  });
+});

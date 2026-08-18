@@ -8,23 +8,33 @@ import type { Document, SearchResult } from "../../../../src/models/kb/document"
  */
 export interface FakeKBClient extends KBClient {
   lastSearchCall: { query: string; topK?: number } | null;
+  lastListCall: { nodePath?: string; limit?: number } | null;
 }
 
-export function createFakeKBClient(searchResult: SearchResult[] = []): FakeKBClient {
+/**
+ * `searchResult` — kết quả cố định trả về mỗi lần gọi search().
+ * `listResult` — kết quả cố định trả về mỗi lần gọi list().
+ */
+export function createFakeKBClient(
+  searchResult: SearchResult[] = [],
+  listResult: Document[] = []
+): FakeKBClient {
   const fake: FakeKBClient = {
     lastSearchCall: null,
+    lastListCall: null,
     async search(query: string, topK?: number) {
       fake.lastSearchCall = { query, topK };
       return searchResult;
     },
-    async list(): Promise<Document[]> {
-      throw new Error("fake KBClient: list() chưa dùng ở case B (search)");
+    async list(nodePath?: string, limit?: number): Promise<Document[]> {
+      fake.lastListCall = { nodePath, limit };
+      return listResult;
     },
     async retrieve(): Promise<Document | null> {
-      throw new Error("fake KBClient: retrieve() chưa dùng ở case B (search)");
+      throw new Error("fake KBClient: retrieve() chưa dùng ở case B/C");
     },
     async add(_input: AddDocumentInput): Promise<Document> {
-      throw new Error("fake KBClient: add() chưa dùng ở case B (search)");
+      throw new Error("fake KBClient: add() chưa dùng ở case B/C");
     },
   };
   return fake;
