@@ -14,6 +14,31 @@ import { registerKbRetrieveCommand } from "./commands/kb/kb-retrieve";
 import { registerKbAddCommand } from "./commands/kb/kb-add";
 import { createKbService } from "./services/kb/kb-service";
 import { createMockKbClient } from "./clients/mock-kb-client";
+import { createHttpKbClient } from "./clients/http-kb-client";
+import type { KBClient } from "./models/kb/kb-client";
+
+/**
+ * Chọn KBClient theo biến môi trường KB_CLIENT (mặc định "mock" nếu không set/rỗng — xem
+ * decisions.vi.md mục 5). KB_CLIENT=http bắt buộc có KB_API_URL — thiếu thì báo lỗi rõ ngay
+ * lúc khởi động (không để CLI chạy mập mờ rồi mới lỗi khi gọi lệnh).
+ */
+function resolveKbClient(): KBClient {
+  const clientType = (process.env.KB_CLIENT ?? "mock").trim().toLowerCase() || "mock";
+
+  if (clientType === "mock") {
+    return createMockKbClient();
+  }
+
+  if (clientType === "http") {
+    const apiUrl = (process.env.KB_API_URL ?? "").trim();
+    if (!apiUrl) {
+      throw new Error("KB_API_URL is required when KB_CLIENT=http");
+    }
+    return createHttpKbClient(apiUrl);
+  }
+
+  throw new Error(`invalid KB_CLIENT: ${clientType} (chỉ nhận "mock" hoặc "http")`);
+}
 
 /**
  * Điểm vào CLI: gắn JSON store + service + đăng ký các lệnh tickets, kb.
@@ -25,8 +50,7 @@ async function main(): Promise<void> {
   const store = createJsonTicketStore(dataPath);
   const service = createTicketService(store);
 
-  // KB_CLIENT (mock | http) — env switch sẽ làm ở case G. Hiện luôn dùng MockKBClient.
-  const kbClient = createMockKbClient();
+  const kbClient = resolveKbClient();
   const kbService = createKbService(kbClient);
 
   const program = new Command();
