@@ -122,4 +122,18 @@ describe("CLI kb add", () => {
       });
     });
   });
+
+  it('--path "   " (chỉ khoảng trắng) -> exit ≠ 0, không tạo document', async () => {
+    await withTempSourceFile("Nội dung.", async (filePath) => {
+      await withTempTicketsFile(async (ticketsPath) => {
+        const result = await runTickets(
+          ["kb", "add", "--file", filePath, "--path", "   "],
+          ticketsPath
+        );
+
+        expect(result.code).not.toBe(0);
+        expect(result.stderr).toMatch(/nodePath/i);
+      });
+    });
+  });
 });

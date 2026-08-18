@@ -70,4 +70,24 @@ describe("createKbService.add", () => {
 
     expect(result).toEqual(created);
   });
+
+  it("title chỉ toàn khoảng trắng -> kb-service báo lỗi, không gọi KBClient.add()", async () => {
+    const client = createFakeKBClient();
+    const service = createKbService(client);
+
+    await expect(
+      service.add({ title: "   ", content: "nội dung", nodePath: "/x" })
+    ).rejects.toThrow(/title/i);
+    expect(client.lastAddCall).toBeNull();
+  });
+
+  it("nodePath chỉ toàn khoảng trắng -> kb-service báo lỗi, không gọi KBClient.add()", async () => {
+    const client = createFakeKBClient();
+    const service = createKbService(client);
+
+    await expect(
+      service.add({ title: "Note", content: "nội dung", nodePath: "   " })
+    ).rejects.toThrow(/nodePath/i);
+    expect(client.lastAddCall).toBeNull();
+  });
 });
