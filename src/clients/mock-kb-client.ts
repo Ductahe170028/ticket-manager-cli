@@ -103,7 +103,6 @@ function findMatchType(doc: Document, keyword: string): "title" | "content" | nu
 /**
  * Tạo KBClient giả lập với 10 document mẫu cố định trong bộ nhớ (mất khi restart chương trình).
  * Style: factory function — không dùng class, giống createJsonTicketStore.
- * add() chưa implement — sẽ làm ở case E.
  */
 export function createMockKbClient(): KBClient {
   const documents: Document[] = [...SEED_DOCUMENTS];
@@ -140,8 +139,11 @@ export function createMockKbClient(): KBClient {
       return documents.find((doc) => doc.id === docId) ?? null;
     },
 
-    async add(_input: AddDocumentInput): Promise<Document> {
-      throw new Error("MockKBClient: add() chưa implement — xem case E");
+    async add(input: AddDocumentInput): Promise<Document> {
+      const id = `doc-${String(documents.length + 1).padStart(3, "0")}`;
+      const created: Document = { id, ...input };
+      documents.push(created);
+      return created;
     },
   };
 }

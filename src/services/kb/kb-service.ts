@@ -1,12 +1,25 @@
 import type { KBClient } from "../../models/kb/kb-client";
 import type { Document, SearchResult } from "../../models/kb/document";
 import { applyLimit } from "../../utils/apply-limit";
+import { normalizeTags, requireNodePath, requireTitle } from "./kb-validation";
+
+/**
+ * Input cho KBService.add — khác AddDocumentInput (models/kb/kb-client.ts) ở chỗ `tags`
+ * không bắt buộc: service tự chuẩn hóa + mặc định `[]` trước khi gửi cho KBClient.
+ */
+export interface AddDocumentServiceInput {
+  title: string;
+  content: string;
+  nodePath: string;
+  tags?: string[];
+}
 
 /** Các thao tác nghiệp vụ KB mà commands được phép gọi. */
 export interface KBService {
   search(query: string, topK?: number): Promise<SearchResult[]>;
   list(nodePath?: string, limit?: number): Promise<Document[]>;
   retrieve(docId: string): Promise<Document>;
+  add(input: AddDocumentServiceInput): Promise<Document>;
 }
 
 /**
@@ -43,6 +56,19 @@ export function createKbService(client: KBClient): KBService {
         throw new Error(`document not found: ${docId}`);
       }
       return doc;
+    },
+
+    /**
+     * Thêm document mới; service chuẩn hóa tags (giống tuần 2) rồi mới gửi cho KBClient —
+     * KBClient không cần biết/lo việc chuẩn hóa.
+     */
+    async add(input: AddDocumentServiceInput): Promise<Document> {
+      return client.add({
+        title: requireTitle(input.title),
+        content: input.content,
+        nodePath: requireNodePath(input.nodePath),
+        tags: normalizeTags(input.tags),
+      });
     },
   };
 }

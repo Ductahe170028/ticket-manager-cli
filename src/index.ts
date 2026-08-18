@@ -10,6 +10,7 @@ import { createJsonTicketStore } from "./storage/json-ticket-store";
 import { registerKbSearchCommand } from "./commands/kb/kb-search";
 import { registerKbListCommand } from "./commands/kb/kb-list";
 import { registerKbRetrieveCommand } from "./commands/kb/kb-retrieve";
+import { registerKbAddCommand } from "./commands/kb/kb-add";
 import { createKbService } from "./services/kb/kb-service";
 import { createMockKbClient } from "./clients/mock-kb-client";
 
@@ -39,6 +40,7 @@ async function main(): Promise<void> {
   registerKbSearchCommand(kbCommand, kbService);
   registerKbListCommand(kbCommand, kbService);
   registerKbRetrieveCommand(kbCommand, kbService);
+  registerKbAddCommand(kbCommand, kbService);
 
   await program.parseAsync(process.argv);
 }
