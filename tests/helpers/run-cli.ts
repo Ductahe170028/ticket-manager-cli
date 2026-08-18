@@ -14,9 +14,10 @@ const indexTs = path.join(projectRoot, "src", "index.ts");
 
 /**
  * Chạy `tickets ...` với TICKETS_PATH trỏ file tạm.
+ * Mặc định luôn ép KB_CLIENT/KB_API_URL rỗng (-> MockKBClient) để test không bị ảnh hưởng bởi
+ * file `.env` trên máy dev (ví dụ ai đó đang để KB_CLIENT=http lúc test tay server thật).
  * `extraEnv` — biến môi trường bổ sung (ví dụ KB_CLIENT, KB_API_URL cho case G) — key có
- * mặt trong `extraEnv` (kể cả giá trị rỗng `""`) sẽ đè lên giá trị `.env`/process hiện tại,
- * vì dotenv không ghi đè biến đã tồn tại sẵn trong process.env của tiến trình con.
+ * mặt trong `extraEnv` sẽ đè lên 2 giá trị mặc định rỗng bên trên.
  */
 export async function runTickets(
   args: string[],
@@ -29,7 +30,13 @@ export async function runTickets(
       [tsxCli, indexTs, ...args],
       {
         cwd: projectRoot,
-        env: { ...process.env, TICKETS_PATH: ticketsPath, ...extraEnv },
+        env: {
+          ...process.env,
+          TICKETS_PATH: ticketsPath,
+          KB_CLIENT: "",
+          KB_API_URL: "",
+          ...extraEnv,
+        },
         encoding: "utf8",
       }
     );

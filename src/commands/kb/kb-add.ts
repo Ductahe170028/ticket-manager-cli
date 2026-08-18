@@ -12,6 +12,7 @@ import { parseTagsOption } from "../parse-tags";
 export function registerKbAddCommand(kbCommand: Command, service: KBService): void {
   kbCommand
     .command("add")
+    .description("Thêm document mới vào Knowledge Base (nội dung đọc từ file --file)")
     .requiredOption("--file <path>", "Đường dẫn file nội dung (bắt buộc)")
     .requiredOption("--path <nodePath>", "Node path để lưu document (bắt buộc)")
     .option("--tags <tags>", "Tags cách nhau bởi dấu phẩy, ví dụ bug,ui")

@@ -8,6 +8,7 @@ import type { KBService } from "../../services/kb/kb-service";
 export function registerKbRetrieveCommand(kbCommand: Command, service: KBService): void {
   kbCommand
     .command("retrieve <docId>")
+    .description("Lấy đầy đủ nội dung 1 document trong Knowledge Base theo id")
     .action(async (docId: string) => {
       const doc = await service.retrieve(docId);
       console.log(`id: ${doc.id}`);

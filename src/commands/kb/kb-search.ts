@@ -8,6 +8,7 @@ import type { KBService } from "../../services/kb/kb-service";
 export function registerKbSearchCommand(kbCommand: Command, service: KBService): void {
   kbCommand
     .command("search <query>")
+    .description("Tìm document trong Knowledge Base theo từ khóa (khớp title trước, content sau)")
     .option("--top-k <n>", "Số kết quả tối đa", "5")
     .action(async (query: string, options: { topK: string }) => {
       const results = await service.search(query, Number(options.topK));

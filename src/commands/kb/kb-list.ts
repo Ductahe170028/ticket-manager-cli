@@ -8,6 +8,7 @@ import type { KBService } from "../../services/kb/kb-service";
 export function registerKbListCommand(kbCommand: Command, service: KBService): void {
   kbCommand
     .command("list")
+    .description("Liệt kê document trong Knowledge Base (không lọc --node -> liệt kê toàn bộ)")
     .option("--node <nodePath>", "Lọc theo node path")
     .option("--limit <n>", "Số kết quả tối đa")
     .action(async (options: { node?: string; limit?: string }) => {
