@@ -1,5 +1,6 @@
 import type { KBClient } from "../../models/kb/kb-client";
 import type { Document, SearchResult } from "../../models/kb/document";
+import { applyLimit } from "../../utils/apply-limit";
 
 /** Các thao tác nghiệp vụ KB mà commands được phép gọi. */
 export interface KBService {
@@ -19,7 +20,7 @@ export function createKbService(client: KBClient): KBService {
      */
     async search(query: string, topK?: number): Promise<SearchResult[]> {
       const results = await client.search(query, topK);
-      return topK !== undefined ? results.slice(0, topK) : results;
+      return applyLimit(results, topK);
     },
 
     /**
@@ -28,7 +29,7 @@ export function createKbService(client: KBClient): KBService {
      */
     async list(nodePath?: string, limit?: number): Promise<Document[]> {
       const results = await client.list(nodePath, limit);
-      return limit !== undefined ? results.slice(0, limit) : results;
+      return applyLimit(results, limit);
     },
   };
 }

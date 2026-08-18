@@ -1,12 +1,17 @@
 import type { AddDocumentInput, KBClient } from "../models/kb/kb-client";
 import type { Document, SearchResult } from "../models/kb/document";
+import { applyLimit } from "../utils/apply-limit";
 
 /**
  * 10 document mẫu cố định — xem docs/plans/week-3/decisions.vi.md mục 4.
  * doc-004..doc-010 cố tình khác nodePath và không trùng từ khóa với doc-001..doc-003
  * (để không phá test cũ đang xanh của case B/C).
+ *
+ * Export ra ngoài (đóng băng bằng Object.freeze) để test tự tính lại kết quả mong đợi
+ * (số lượng, danh sách id...) từ chính dữ liệu này — không gõ tay số cố định trong test.
+ * Nhờ vậy test luôn đúng dù sau này thêm/bớt document mẫu, không cần sửa test theo tay.
  */
-const SEED_DOCUMENTS: Document[] = [
+export const SEED_DOCUMENTS: readonly Document[] = Object.freeze([
   {
     id: "doc-001",
     title: "Customer Response Template",
@@ -86,7 +91,7 @@ const SEED_DOCUMENTS: Document[] = [
     content:
       "Kính gửi khách hàng, đội ngũ hỗ trợ đang ưu tiên xử lý yêu cầu escalation của bạn ngay lập tức.",
   },
-];
+]);
 
 /** Tìm nơi khớp keyword — ưu tiên title trước, sau đó mới xét content. */
 function findMatchType(doc: Document, keyword: string): "title" | "content" | null {
@@ -119,7 +124,7 @@ export function createMockKbClient(): KBClient {
         }
       }
 
-      return topK !== undefined ? results.slice(0, topK) : results;
+      return applyLimit(results, topK);
     },
 
     async list(nodePath?: string, limit?: number): Promise<Document[]> {
@@ -128,7 +133,7 @@ export function createMockKbClient(): KBClient {
           ? documents.filter((doc) => doc.nodePath === nodePath)
           : [...documents];
 
-      return limit !== undefined ? filtered.slice(0, limit) : filtered;
+      return applyLimit(filtered, limit);
     },
 
     async retrieve(): Promise<Document | null> {
