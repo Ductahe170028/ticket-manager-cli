@@ -55,3 +55,23 @@ export async function withTempTicketsFile(
     await fs.rm(dir, { recursive: true, force: true });
   }
 }
+
+/**
+ * Tạo 1 file nguồn tạm (nội dung `content`, tên `filename`) để test `kb add --file <path>` —
+ * dùng file thật (không mock fs) vì bản thân việc đọc file cũng nằm trong hành vi cần kiểm.
+ * Xong thì xóa cả thư mục tạm.
+ */
+export async function withTempSourceFile(
+  content: string,
+  run: (filePath: string) => Promise<void>,
+  filename = "sample-doc.md"
+): Promise<void> {
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "kb-add-source-"));
+  const filePath = path.join(dir, filename);
+  await fs.writeFile(filePath, content, "utf8");
+  try {
+    await run(filePath);
+  } finally {
+    await fs.rm(dir, { recursive: true, force: true });
+  }
+}

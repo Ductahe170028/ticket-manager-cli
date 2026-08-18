@@ -3,29 +3,33 @@ import type { Document, SearchResult } from "../../../../src/models/kb/document"
 
 /**
  * KBClient giả cho unit test kb-service — không đụng MockKBClient/HTTPKBClient thật.
- * search()/list()/retrieve() trả về kết quả cố định mỗi lần gọi; ghi lại tham số lần gọi
- * gần nhất để assert. add() chưa cần cho case B/C/D — gọi tới sẽ throw để lộ ra ngay nếu dùng nhầm.
+ * search()/list()/retrieve()/add() trả về kết quả cố định mỗi lần gọi; ghi lại tham số lần
+ * gọi gần nhất để assert.
  */
 export interface FakeKBClient extends KBClient {
   lastSearchCall: { query: string; topK?: number } | null;
   lastListCall: { nodePath?: string; limit?: number } | null;
   lastRetrieveCall: string | null;
+  lastAddCall: AddDocumentInput | null;
 }
 
 /**
  * `searchResult` — kết quả cố định trả về mỗi lần gọi search().
  * `listResult` — kết quả cố định trả về mỗi lần gọi list().
  * `retrieveResult` — kết quả cố định trả về mỗi lần gọi retrieve() (null = không tìm thấy).
+ * `addResult` — document trả về mỗi lần gọi add(); không truyền → tự ghép input + id giả "doc-fake".
  */
 export function createFakeKBClient(
   searchResult: SearchResult[] = [],
   listResult: Document[] = [],
-  retrieveResult: Document | null = null
+  retrieveResult: Document | null = null,
+  addResult: Document | null = null
 ): FakeKBClient {
   const fake: FakeKBClient = {
     lastSearchCall: null,
     lastListCall: null,
     lastRetrieveCall: null,
+    lastAddCall: null,
     async search(query: string, topK?: number) {
       fake.lastSearchCall = { query, topK };
       return searchResult;
@@ -38,8 +42,9 @@ export function createFakeKBClient(
       fake.lastRetrieveCall = docId;
       return retrieveResult;
     },
-    async add(_input: AddDocumentInput): Promise<Document> {
-      throw new Error("fake KBClient: add() chưa dùng ở case B/C/D");
+    async add(input: AddDocumentInput): Promise<Document> {
+      fake.lastAddCall = input;
+      return addResult ?? { id: "doc-fake", ...input };
     },
   };
   return fake;

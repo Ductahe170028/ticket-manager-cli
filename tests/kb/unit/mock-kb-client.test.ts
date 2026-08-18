@@ -114,3 +114,64 @@ describe("createMockKbClient.retrieve", () => {
     expect(result).toBeNull();
   });
 });
+
+describe("createMockKbClient.add", () => {
+  it("E: add() thêm document mới -> retrieve() bằng id mới thấy đúng document", async () => {
+    const client = createMockKbClient();
+
+    const created = await client.add({
+      title: "New Doc",
+      content: "nội dung mới",
+      nodePath: "/new/node",
+      tags: ["a", "b"],
+    });
+
+    expect(created.id).toBeTruthy();
+    const found = await client.retrieve(created.id);
+    expect(found).toEqual(created);
+  });
+
+  it("E: add() sinh id mới, không trùng với id nào đã có sẵn", async () => {
+    const client = createMockKbClient();
+    const existingIds = SEED_DOCUMENTS.map((d) => d.id);
+
+    const created = await client.add({
+      title: "New Doc",
+      content: "nội dung mới",
+      nodePath: "/new/node",
+      tags: [],
+    });
+
+    expect(existingIds).not.toContain(created.id);
+  });
+
+  it("E: add() làm tăng đúng 1 tổng số document khi list() không lọc", async () => {
+    const client = createMockKbClient();
+    const before = await client.list();
+
+    await client.add({
+      title: "New Doc",
+      content: "nội dung mới",
+      nodePath: "/new/node",
+      tags: [],
+    });
+    const after = await client.list();
+
+    expect(after).toHaveLength(before.length + 1);
+  });
+
+  it("E: add() trên 1 instance không ảnh hưởng tới instance MockKBClient khác (không đụng SEED_DOCUMENTS gốc)", async () => {
+    const clientA = createMockKbClient();
+    await clientA.add({
+      title: "Only in A",
+      content: "chỉ có ở client A",
+      nodePath: "/new/node",
+      tags: [],
+    });
+
+    const clientB = createMockKbClient();
+    const resultsInB = await clientB.list();
+
+    expect(resultsInB).toHaveLength(SEED_DOCUMENTS.length);
+  });
+});
